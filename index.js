@@ -7,6 +7,7 @@ import Button from './lib/Button';
 import TagItem from './lib/TagItem';
 import utilities from './lib/utilities';
 import PropTypes from 'prop-types';
+import { setLocale } from 'yup';
 
 const { height } = Dimensions.get('window');
 const INIT_HEIGHT = height * 0.6;
@@ -95,6 +96,12 @@ class Select2 extends Component {
             if (item.checked) selectedItem.push(item);
         })
         this.setState({ data, selectedItem });
+        let selectedIds = [], selectedObjectItems = [];
+        this.state.selectedItem.map(item => {
+            selectedIds.push(item.id);
+            selectedObjectItems.push(item);
+        })
+        this.setState({ show: false, keyword: '', preSelectedItem: selectedItem }, () => this.props.onSelect && this.props.onSelect(this.state.selectedItem));
     }
     keyExtractor = (item, idx) => idx.toString();
     renderItem = ({ item, idx }) => {
@@ -127,7 +134,7 @@ class Select2 extends Component {
 
     render() {
         let {
-            style, modalStyle, title, onSelect, onRemoveItem, popupTitle, colorTheme,
+            style, modalStyle, title, onRemoveItem, popupTitle, colorTheme,
             isSelectSingle, cancelButtonText, selectButtonText, searchPlaceHolderText,
             selectedTitleStyle, buttonTextStyle, buttonStyle, showSearchBox
         } = this.props;
@@ -149,70 +156,45 @@ class Select2 extends Component {
                     hideModalContentWhileAnimating
                     isVisible={show}>
                     <Animated.View style={[styles.modalContainer, modalStyle, { height: this.animatedHeight }]}>
-                        <View>
-                            <Text style={[styles.title, this.defaultFont, { color: colorTheme }]}>
+                        <View style={{ backgroundColor: '#171a5b', borderTopLeftRadius: 7, borderTopRightRadius: 7, paddingTop: 16 }}>
+                            <Text style={[styles.title, this.defaultFont, { color: 'white' }]}>
                                 {popupTitle || title}
                             </Text>
                         </View>
-                        <View style={styles.line} />
-                        {
-                            showSearchBox
-                                ? <TextInput
-                                    underlineColorAndroid='transparent'
-                                    returnKeyType='done'
-                                    style={[styles.inputKeyword, this.defaultFont]}
-                                    placeholder={searchPlaceHolderText}
-                                    selectionColor={colorTheme}
-                                    onChangeText={keyword => this.setState({ keyword })}
-                                    onFocus={() => {
-                                        Animated.spring(this.animatedHeight, {
-                                            toValue: INIT_HEIGHT + (Platform.OS === 'ios' ? height * 0.2 : 0),
-                                            friction: 7
-                                        }).start();
-                                    }}
-                                    onBlur={() => {
-                                        Animated.spring(this.animatedHeight, {
-                                            toValue: INIT_HEIGHT,
-                                            friction: 7
-                                        }).start();
-                                    }}
-                                />
-                                : null
-                        }
-                        <FlatList
-                            style={styles.listOption}
-                            data={this.dataRender || []}
-                            keyExtractor={this.keyExtractor}
-                            renderItem={this.renderItem}
-                            ListEmptyComponent={this.renderEmpty}
-                        />
-
-                        <View style={styles.buttonWrapper}>
-                            <Button
-                                defaultFont={this.defaultFont}
-                                onPress={() => {
-                                    this.cancelSelection();
-                                }}
-                                title={cancelButtonText}
-                                textColor={colorTheme}
-                                backgroundColor='#fff'
-                                textStyle={buttonTextStyle}
-                                style={[styles.button, buttonStyle, { marginRight: 5, marginLeft: 10, borderWidth: 1, borderColor: colorTheme }]} />
-                            <Button
-                                defaultFont={this.defaultFont}
-                                onPress={() => {
-                                    let selectedIds = [], selectedObjectItems = [];
-                                    selectedItem.map(item => {
-                                        selectedIds.push(item.id);
-                                        selectedObjectItems.push(item);
-                                    })
-                                    onSelect && onSelect(selectedIds, selectedObjectItems);
-                                    this.setState({ show: false, keyword: '', preSelectedItem: selectedItem });
-                                }}
-                                title={selectButtonText}
-                                backgroundColor={colorTheme}
-                                textStyle={buttonTextStyle}
-                                style={[styles.button, buttonStyle, { marginLeft: 5, marginRight: 10 }]} />
+                        <View style={{ backgroundColor: "white" }}>
+                            <View style={styles.line} />
+                            {
+                                showSearchBox
+                                    ? <TextInput
+                                        underlineColorAndroid='transparent'
+                                        returnKeyType='done'
+                                        style={[styles.inputKeyword, this.defaultFont, { color: '#171a5b' }]}
+                                        placeholder={searchPlaceHolderText}
+                                        placeholderTextColor='#171a5b'
+                                        selectionColor={colorTheme}
+                                        onChangeText={keyword => this.setState({ keyword })}
+                                        onFocus={() => {
+                                            Animated.spring(this.animatedHeight, {
+                                                toValue: INIT_HEIGHT + (Platform.OS === 'ios' ? height * 0.2 : 0),
+                                                friction: 7
+                                            }).start();
+                                        }}
+                                        onBlur={() => {
+                                            Animated.spring(this.animatedHeight, {
+                                                toValue: INIT_HEIGHT,
+                                                friction: 7
+                                            }).start();
+                                        }}
+                                    />
+                                    : null
+                            }
+                            <FlatList
+                                style={styles.listOption}
+                                data={this.dataRender || []}
+                                keyExtractor={this.keyExtractor}
+                                renderItem={this.renderItem}
+                                ListEmptyComponent={this.renderEmpty}
+                            />
                         </View>
                     </Animated.View>
                 </Modal>
@@ -220,7 +202,7 @@ class Select2 extends Component {
                     preSelectedItem.length > 0
                         ? (
                             isSelectSingle
-                                ? <Text style={[styles.selectedTitlte, this.defaultFont, selectedTitleStyle, { color: '#333' }]}>{preSelectedItem[0].name}</Text>
+                                ? <Text style={[styles.selectedTitlte, this.defaultFont, selectedTitleStyle, { color: '#171a5b' }]}>{preSelectedItem[0].name}</Text>
                                 : <View style={styles.tagWrapper}>
                                     {
                                         preSelectedItem.map((tag, index) => {
@@ -250,7 +232,10 @@ class Select2 extends Component {
                                     }
                                 </View>
                         )
-                        : <Text style={[styles.selectedTitlte, this.defaultFont, selectedTitleStyle]}>{title}</Text>
+                        : <View style={{ flexDirection: 'row', flex: 1 }}>
+                            <Text style={[styles.selectedTitlte, this.defaultFont, selectedTitleStyle]}>{title}</Text>
+                            <Icon name='chevron-down' color='#171a5b' size={20} />
+                        </View>
                 }
             </TouchableOpacity>
         );
@@ -265,7 +250,7 @@ const styles = StyleSheet.create({
         borderColor: '#cacaca', paddingVertical: 4
     },
     modalContainer: {
-        paddingTop: 16, backgroundColor: '#fff', borderTopLeftRadius: 8, borderTopRightRadius: 8
+        backgroundColor: 'white', borderTopLeftRadius: 7, borderTopRightRadius: 7
     },
     title: {
         fontSize: 16, marginBottom: 16, width: '100%', textAlign: 'center'
@@ -274,7 +259,7 @@ const styles = StyleSheet.create({
         height: 1, width: '100%', backgroundColor: '#cacaca'
     },
     inputKeyword: {
-        height: 40, borderRadius: 5, borderWidth: 1, borderColor: '#cacaca',
+        height: 40, borderRadius: 5, borderWidth: 1, borderColor: '#171a5b',
         paddingLeft: 8, marginHorizontal: 24, marginTop: 16
     },
     buttonWrapper: {
@@ -298,7 +283,7 @@ const styles = StyleSheet.create({
         paddingVertical: 12, flexDirection: 'row', alignItems: 'center'
     },
     itemText: {
-        fontSize: 16, color: '#333', flex: 1
+        fontSize: 16, color: '#171a5b', flex: 1
     },
     itemIcon: {
         width: 30, textAlign: 'right'
