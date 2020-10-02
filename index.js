@@ -134,7 +134,7 @@ class Select2 extends Component {
 
     render() {
         let {
-            style, modalStyle, title, onRemoveItem, popupTitle, colorTheme,
+            style, modalStyle, title, afterSearch, onRemoveItem, popupTitle, colorTheme,
             isSelectSingle, cancelButtonText, selectButtonText, searchPlaceHolderText,
             selectedTitleStyle, buttonTextStyle, buttonStyle, showSearchBox
         } = this.props;
@@ -202,7 +202,7 @@ class Select2 extends Component {
                     preSelectedItem.length > 0
                         ? (
                             isSelectSingle
-                                ? <Text style={[styles.selectedTitlte, this.defaultFont, selectedTitleStyle, { color: '#171a5b' }]}>{preSelectedItem[0].name}</Text>
+                                ? <Text style={[styles.selectedTitlte, this.defaultFont, selectedTitleStyle, { color: '#171a5b' }]}>{afterSearch ? afterSearch : preSelectedItem[0].name}</Text>
                                 : <View style={styles.tagWrapper}>
                                     {
                                         preSelectedItem.map((tag, index) => {
