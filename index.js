@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { Text, StyleSheet, TouchableOpacity, View, FlatList, TextInput, Dimensions, Animated, Platform } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, View, FlatList, TextInput, Dimensions, Animated, Platform, SafeAreaView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Modal from 'react-native-modal';
 import Button from './lib/Button';
@@ -188,13 +188,15 @@ class Select2 extends Component {
                                     />
                                     : null
                             }
-                            <FlatList
-                                style={styles.listOption}
-                                data={this.dataRender || []}
-                                keyExtractor={this.keyExtractor}
-                                renderItem={this.renderItem}
-                                ListEmptyComponent={this.renderEmpty}
-                            />
+                            <View style={{ marginBottom: 200 }}>
+                                <FlatList
+                                    style={styles.listOption}
+                                    data={this.dataRender || []}
+                                    keyExtractor={this.keyExtractor}
+                                    renderItem={this.renderItem}
+                                    ListEmptyComponent={this.renderEmpty}
+                                />
+                            </View>
                         </View>
                     </Animated.View>
                 </Modal>
